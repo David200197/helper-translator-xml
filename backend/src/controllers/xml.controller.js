@@ -39,11 +39,28 @@ export const getAllXmlData = async (req, res) => {
 export const getOneXmlData = async (req, res) => {
   const id = req.params.id;
   const data = await xmlDataCollection.findOneAsync({ id });
+  if (!data) return res.json({ ok: false });
   res.json({ ok: true, data });
 };
 
 export const removeOneXmlData = async (req, res) => {
   const id = req.params.id;
-  await xmlDataCollection.removeAsync({ id });
-  res.json({ ok: true });
+  const countDeleted = await xmlDataCollection.removeAsync({ id });
+  res.json({ ok: Boolean(countDeleted) });
+};
+
+export const downloadXml = async (req, res) => {
+  const id = req.params.id;
+  const language =
+    req.query.language !== "es" && req.query.language !== "en"
+      ? "es"
+      : req.query.language;
+  const data = await xmlDataCollection.findOneAsync({ id });
+  if (!data) return res.json({ ok: false });
+  const xml = convert.js2xml(data[language]);
+
+  res.setHeader("Content-disposition", "attachment; filename=" + data.name);
+  res.setHeader("Content-type", "application/xml");
+  const buffer = Buffer.from(xml, "utf8");
+  res.end(buffer)
 };

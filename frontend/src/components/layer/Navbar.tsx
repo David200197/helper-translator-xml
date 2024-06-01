@@ -40,9 +40,6 @@ const Navbar = () => {
           <MenubarItem onClick={addXML}>
             Agregar XML <MenubarShortcut>Ctrl + O</MenubarShortcut>
           </MenubarItem>
-          <MenubarItem disabled>
-            Salvar <MenubarShortcut>Ctrl + S</MenubarShortcut>
-          </MenubarItem>
           <MenubarSeparator />
           <MenubarItem onClick={closeApp}>
             Cerrar <MenubarShortcut>Ctrl + E</MenubarShortcut>
