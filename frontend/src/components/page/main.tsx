@@ -10,6 +10,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+import { MoreHorizontal } from "lucide-react";
+
 import {
   Table,
   TableBody,
@@ -18,6 +20,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 const columns: ColumnDef<XmlData>[] = [
   {
@@ -27,6 +38,7 @@ const columns: ColumnDef<XmlData>[] = [
   {
     accessorKey: "traductionPercent",
     header: "Porciento de traducción",
+    cell: ({ row }) => row.getValue("traductionPercent") + "%",
   },
   {
     accessorKey: "createdAt",
@@ -36,6 +48,44 @@ const columns: ColumnDef<XmlData>[] = [
     accessorKey: "updatedAt",
     header: "Fecha de actualización",
   },
+  {
+    id: "actions",
+    cell: ({ row, table }) => {
+      const xmlData = row.original;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const deleteOneXmlData = (table.options.meta as any).deleteOneXmlData;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const downloadXml = (table.options.meta as any).downloadXml;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem>Traducir</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => downloadXml(xmlData.id, "en")}>
+              Descargar Xml en ingles
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => downloadXml(xmlData.id, "es")}>
+              Descargar Xml en español
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => deleteOneXmlData(xmlData.id)}
+              className="text-red-600"
+            >
+              Eliminar
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
 ];
 
 /* interface DataTableProps<TData, TValue> {
@@ -44,12 +94,18 @@ const columns: ColumnDef<XmlData>[] = [
 } */
 
 const MainPage = () => {
-  const { xmlData } = useXmlData({ autoLoad: true });
+  const { xmlData, downloadXml, deleteOneXmlData } = useXmlData({
+    autoLoad: true,
+  });
 
   const table = useReactTable({
     data: xmlData,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    meta: {
+      downloadXml,
+      deleteOneXmlData,
+    },
   });
 
   return (
