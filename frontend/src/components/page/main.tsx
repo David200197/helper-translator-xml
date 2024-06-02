@@ -1,7 +1,7 @@
 //https://ui.shadcn.com/docs/components/data-table
 
 import { useXmlData } from "@/hooks/use-xml-data";
-import { XmlData } from "@/interfaces/xml-data";
+import { XmlData } from "@/models/xml-data";
 
 import {
   ColumnDef,

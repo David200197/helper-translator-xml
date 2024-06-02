@@ -10,27 +10,18 @@ import {
 } from "../ui/menubar";
 
 import { useHotkeys } from "@/hooks/use-hotkeys";
-import { loadFile } from "@/utils/load-file";
-import env from "@/env";
-import toast from "react-hot-toast";
+import { useXmlData } from "@/hooks/use-xml-data";
 
 const Navbar = () => {
-  const addXML = async () => {
-    const files = await loadFile({ accept: "text/xml", multiple: true });
-    if (!files) return;
-    const body = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      body.append("files", files[i], files[i].name);
-    }
-    await fetch(`${env.BACK}/api/xml`, {
-      method: "POST",
-      body,
-    });
-    toast.success("Xml agregado correctamente");
+  const { addXML } = useXmlData();
+
+  const saveTranslate = () => {
+    console.log("save XML");
   };
 
   useHotkeys("ctrl + e", closeApp);
   useHotkeys("ctrl + o", addXML);
+  useHotkeys("ctrl + s", saveTranslate);
 
   return (
     <Menubar className="fixed w-full top-0 left-0 rounded-none">
@@ -39,6 +30,9 @@ const Navbar = () => {
         <MenubarContent>
           <MenubarItem onClick={addXML}>
             Agregar XML <MenubarShortcut>Ctrl + O</MenubarShortcut>
+          </MenubarItem>
+          <MenubarItem disabled onClick={addXML}>
+            Salvar Traducción <MenubarShortcut>Ctrl + S</MenubarShortcut>
           </MenubarItem>
           <MenubarSeparator />
           <MenubarItem onClick={closeApp}>

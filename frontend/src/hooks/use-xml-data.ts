@@ -1,6 +1,7 @@
 import env from "@/env";
-import { XmlData } from "@/interfaces/xml-data";
-import { useEffect, useState } from "react";
+import { useXmlDataStore } from "@/store/xml-data.store";
+import { loadFile } from "@/utils/load-file";
+import { useCallback, useEffect } from "react";
 import toast from "react-hot-toast";
 
 type Options = { autoLoad?: boolean };
@@ -8,15 +9,32 @@ type Options = { autoLoad?: boolean };
 const getXmlDataUrl = (url: string = "") => `${env.BACK}/api/xml${url}`;
 
 export const useXmlData = ({ autoLoad = false }: Options = {}) => {
-  const [xmlData, setXmlData] = useState<XmlData[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const { page, setPage, setXmlData, xmlData } = useXmlDataStore();
 
-  const getAllXmlData = async (page: number) => {
-    const { ok, data } = await fetch(getXmlDataUrl(`?page=${page}`)).then(
-      (res) => res.json()
-    );
-    if (!ok) return toast.error("Los metadatos de xml no a sido cargados");
-    setXmlData(data);
+  const getAllXmlData = useCallback(
+    async (page: number) => {
+      const { ok, data } = await fetch(getXmlDataUrl(`?page=${page}`)).then(
+        (res) => res.json()
+      );
+      if (!ok) return toast.error("Los metadatos de xml no a sido cargados");
+      setXmlData(data);
+    },
+    [setXmlData]
+  );
+
+  const addXML = async () => {
+    const files = await loadFile({ accept: "text/xml", multiple: true });
+    if (!files) return;
+    const body = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      body.append("files", files[i], files[i].name);
+    }
+    await fetch(`${env.BACK}/api/xml`, {
+      method: "POST",
+      body,
+    });
+    await getAllXmlData(page);
+    toast.success("Xml agregado correctamente");
   };
 
   const downloadXml = async (id: string, language: "en" | "es") => {
@@ -39,22 +57,24 @@ export const useXmlData = ({ autoLoad = false }: Options = {}) => {
     }).then((res) => res.json());
     if (!ok) return toast.error("Los metadatos de xml no a sido borrados");
     toast.success("Los metadatos de xml a sido borrados");
-    getAllXmlData(currentPage);
+    getAllXmlData(page);
   };
 
   useEffect(() => {
     const run = async () => {
       if (!autoLoad) return;
-      getAllXmlData(currentPage);
+      getAllXmlData(page);
     };
     run();
-  }, [autoLoad, currentPage]);
+  }, [autoLoad, getAllXmlData, page]);
 
   return {
     xmlData,
-    getXmlDataUrl,
-    setCurrentPage,
+    getAllXmlData,
+    setPage,
+    page,
     downloadXml,
     deleteOneXmlData,
+    addXML
   };
 };
