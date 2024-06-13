@@ -9,17 +9,31 @@ type Options = { autoLoad?: boolean };
 const getXmlDataUrl = (url: string = "") => `${env.BACK}/api/xml${url}`;
 
 export const useXmlData = ({ autoLoad = false }: Options = {}) => {
-  const { page, setPage, setXmlData, xmlData } = useXmlDataStore();
+  const {
+    page,
+    setPage,
+    setXmlData,
+    xmlData,
+    setTotalElement,
+    setTotalPage,
+    totalElement,
+    totalPage,
+  } = useXmlDataStore();
+
+  const isInitialPage = page <= 1;
+  const isEndPage = page >= totalPage;
 
   const getAllXmlData = useCallback(
     async (page: number) => {
-      const { ok, data } = await fetch(getXmlDataUrl(`?page=${page}`)).then(
-        (res) => res.json()
-      );
+      const { ok, data, totalElement, totalPage } = await fetch(
+        getXmlDataUrl(`?page=${page}`)
+      ).then((res) => res.json());
       if (!ok) return toast.error("Los metadatos de xml no a sido cargados");
+      setTotalElement(totalElement);
+      setTotalPage(totalPage);
       setXmlData(data);
     },
-    [setXmlData]
+    [setTotalElement, setTotalPage, setXmlData]
   );
 
   const addXML = async () => {
@@ -60,6 +74,16 @@ export const useXmlData = ({ autoLoad = false }: Options = {}) => {
     getAllXmlData(page);
   };
 
+  const nextPage = () => {
+    if (isEndPage) return;
+    setPage(page + 1);
+  };
+
+  const prevPage = () => {
+    if (isInitialPage) return;
+    setPage(page - 1);
+  };
+
   useEffect(() => {
     const run = async () => {
       if (!autoLoad) return;
@@ -75,6 +99,12 @@ export const useXmlData = ({ autoLoad = false }: Options = {}) => {
     page,
     downloadXml,
     deleteOneXmlData,
-    addXML
+    addXML,
+    totalElement,
+    totalPage,
+    nextPage,
+    prevPage,
+    isInitialPage,
+    isEndPage,
   };
 };

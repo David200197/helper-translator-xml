@@ -17,7 +17,7 @@ const main = async () => {
 
   app.listen(port, async () => {
     console.log(`Example app listening on port ${port}`);
-    await open(`http://localhost:${port}/`);
+    if (!process.env.DEV) await open(`http://localhost:${port}/`)
   });
 };
 main();

@@ -15,38 +15,47 @@ export const setXmlData = async (req, res) => {
     const es = convertEnToEmptyEs(en);
     const createdAt = new Date();
     const updatedAt = new Date();
-    return { id, name, en, es, updatedAt, createdAt };
+    return { id, name, en, es, updatedAt, createdAt, traductionPercent: 0 };
   });
   await xmlDataCollection.insertAsync(xmlData);
   res.json({ ok: true });
 };
 
 export const getAllXmlData = async (req, res) => {
+  const sortBy = req.query.sortBy || "updatedAt"
+  const sort = +(req.query.sort ?? "-1")
   const page = +(req.query.page ?? "1");
   const paginator = new Paginator({ page, perPage: 10 });
   const xmlData = await xmlDataCollection
     .findAsync({}, { en: 0 })
-    .sort({ updatedAt: -1 })
+    .sort({ [sortBy]: sort })
     .skip(paginator.skip)
     .limit(paginator.limit);
+
+  console.log(xmlData[0])
+
+  const totalElement = await xmlDataCollection.countAsync({})
+  const totalPage = paginator.getTotalPage(totalElement)
+
   const data = xmlData.map(({ es, ...value }) => ({
     ...value,
     traductionPercent: getTraductionPercent(es),
   }));
-  res.json({ ok: true, data });
+  res.json({ ok: true, data, totalElement, totalPage });
 };
 
 export const getOneXmlData = async (req, res) => {
   const id = req.params.id;
   const data = await xmlDataCollection.findOneAsync({ id });
-  if (!data) return res.json({ ok: false });
+  if (!data) return res.status(400).json({ ok: false });
   res.json({ ok: true, data });
 };
 
 export const removeOneXmlData = async (req, res) => {
   const id = req.params.id;
   const countDeleted = await xmlDataCollection.removeAsync({ id });
-  res.json({ ok: Boolean(countDeleted) });
+  if (!countDeleted) return res.status(400).json({ ok: false });
+  res.json({ ok: true });
 };
 
 export const downloadXml = async (req, res) => {
@@ -56,9 +65,8 @@ export const downloadXml = async (req, res) => {
       ? "es"
       : req.query.language;
   const data = await xmlDataCollection.findOneAsync({ id });
-  if (!data) return res.json({ ok: false });
+  if (!data) return res.status(400).json({ ok: false });
   const xml = convert.js2xml(data[language]);
-
   res.setHeader("Content-disposition", "attachment; filename=" + data.name);
   res.setHeader("Content-type", "application/xml");
   const buffer = Buffer.from(xml, "utf8");

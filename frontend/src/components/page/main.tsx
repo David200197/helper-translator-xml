@@ -19,24 +19,30 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import ActionCell from "../layer/ActionCell";
+import { Button } from "../ui/button";
+import SortButton from "../layer/SortButton";
 
 const columns: ColumnDef<XmlData>[] = [
   {
     accessorKey: "name",
-    header: "Nombre",
+    header: () => <SortButton name="Nombre" field="name" />,
   },
   {
     accessorKey: "traductionPercent",
-    header: "Porciento de traducción",
+    header: () => (
+      <SortButton name="Porciento de traducción" field="traductionPercent" />
+    ),
     cell: ({ row }) => row.getValue("traductionPercent") + "%",
   },
   {
     accessorKey: "createdAt",
-    header: "Fecha de creación",
+    header: () => <SortButton name="Fecha de creación" field="createdAt" />,
   },
   {
     accessorKey: "updatedAt",
-    header: "Fecha de actualización",
+    header: () => (
+      <SortButton name="Fecha de actualización" field="updatedAt" />
+    ),
   },
   {
     id: "actions",
@@ -50,7 +56,17 @@ const columns: ColumnDef<XmlData>[] = [
 } */
 
 const MainPage = () => {
-  const { xmlData, downloadXml, deleteOneXmlData } = useXmlData({
+  const {
+    xmlData,
+    downloadXml,
+    deleteOneXmlData,
+    totalPage,
+    page,
+    isEndPage,
+    isInitialPage,
+    nextPage,
+    prevPage,
+  } = useXmlData({
     autoLoad: true,
   });
 
@@ -65,49 +81,78 @@ const MainPage = () => {
   });
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+    <div>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={prevPage}
+          disabled={isInitialPage}
+        >
+          Previous
+        </Button>
+        <p>
+          {page} - {totalPage}
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={nextPage}
+          disabled={isEndPage}
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 };
