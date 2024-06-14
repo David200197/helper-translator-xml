@@ -6,11 +6,11 @@ import { router } from "./router";
 
 const App = () => {
   return (
-    <>
+    <div className="w-full h-screen pt-10">
       <Navbar />
       <RouterProvider router={router} />
       <Toaster />
-    </>
+    </div>
   );
 };
 

@@ -28,7 +28,7 @@ export const getAllXmlData = async (req, res) => {
   const filter = (req.query.filter ?? "");
   const filterBy = (req.query.filterBy ?? "name");
   const filterValue = filterBy === "traductionPercent" && filter ? +filter : new RegExp(filter)
-  const paginator = new Paginator({ page, perPage: 10 });
+  const paginator = new Paginator({ page, perPage: 6 });
   const xmlData = await xmlDataCollection
     .findAsync({ [filterBy]: filterValue }, { en: 0 })
     .sort({ [sortBy]: sort })

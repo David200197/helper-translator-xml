@@ -127,7 +127,7 @@ const MainPage = () => {
           </SelectContent>
         </Select>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border min-h-[450px]">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -153,6 +153,7 @@ const MainPage = () => {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="!border-x-1 !border-solid"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
