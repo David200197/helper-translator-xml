@@ -18,15 +18,20 @@ export const useXmlData = ({ autoLoad = false }: Options = {}) => {
     setTotalPage,
     totalElement,
     totalPage,
+    changeSort,
+    setSortBy,
+    sort,
+    sortBy,
+    setSort,
   } = useXmlDataStore();
 
   const isInitialPage = page <= 1;
   const isEndPage = page >= totalPage;
 
   const getAllXmlData = useCallback(
-    async (page: number) => {
+    async (page: number, sortBy: string, sort: 1 | -1) => {
       const { ok, data, totalElement, totalPage } = await fetch(
-        getXmlDataUrl(`?page=${page}`)
+        getXmlDataUrl(`?page=${page}&sort=${sort}&sortBy=${sortBy}`)
       ).then((res) => res.json());
       if (!ok) return toast.error("Los metadatos de xml no a sido cargados");
       setTotalElement(totalElement);
@@ -47,7 +52,7 @@ export const useXmlData = ({ autoLoad = false }: Options = {}) => {
       method: "POST",
       body,
     });
-    await getAllXmlData(page);
+    await getAllXmlData(page, sortBy, sort);
     toast.success("Xml agregado correctamente");
   };
 
@@ -71,7 +76,7 @@ export const useXmlData = ({ autoLoad = false }: Options = {}) => {
     }).then((res) => res.json());
     if (!ok) return toast.error("Los metadatos de xml no a sido borrados");
     toast.success("Los metadatos de xml a sido borrados");
-    getAllXmlData(page);
+    getAllXmlData(page, sortBy, sort);
   };
 
   const nextPage = () => {
@@ -87,10 +92,10 @@ export const useXmlData = ({ autoLoad = false }: Options = {}) => {
   useEffect(() => {
     const run = async () => {
       if (!autoLoad) return;
-      getAllXmlData(page);
+      getAllXmlData(page, sortBy, sort);
     };
     run();
-  }, [autoLoad, getAllXmlData, page]);
+  }, [autoLoad, getAllXmlData, page, sort, sortBy]);
 
   return {
     xmlData,
@@ -106,5 +111,10 @@ export const useXmlData = ({ autoLoad = false }: Options = {}) => {
     prevPage,
     isInitialPage,
     isEndPage,
+    changeSort,
+    setSortBy,
+    sort,
+    sortBy,
+    setSort,
   };
 };

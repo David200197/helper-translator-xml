@@ -13,6 +13,7 @@ interface XmlDataStore {
   setTotalElement: (totalElement: number) => void;
   setTotalPage: (totalPage: number) => void;
   setSortBy: (sortBy: string) => void;
+  changeSort: () => void;
   setSort: (sort: 1 | -1) => void;
 }
 
@@ -28,5 +29,6 @@ export const useXmlDataStore = create<XmlDataStore>((set) => ({
   setTotalElement: (totalElement) => set({ totalElement }),
   setTotalPage: (totalPage) => set({ totalPage }),
   setSortBy: (sortBy) => set({ sortBy }),
+  changeSort: () => set(({ sort }) => ({ sort: sort === 1 ? -1 : 1 })),
   setSort: (sort) => set({ sort }),
 }));
