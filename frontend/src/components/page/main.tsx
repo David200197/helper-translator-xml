@@ -85,6 +85,7 @@ const MainPage = () => {
     sort,
     sortBy,
     filterBy,
+    addXML,
   } = useXmlData({
     autoLoad: true,
   });
@@ -126,8 +127,11 @@ const MainPage = () => {
             </SelectItem>
           </SelectContent>
         </Select>
+        <Button onClick={addXML} className="ml-2">
+          Agregar XML
+        </Button>
       </div>
-      <div className="rounded-md border min-h-[450px]">
+      <div className="rounded-md border min-h-[440px]">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -149,11 +153,14 @@ const MainPage = () => {
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row, index) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="!border-x-1 !border-solid"
+                  style={{
+                    borderTop: "1px solid #e5e5e5",
+                    borderBottom: index !== 5 ? "1px solid #e5e5e5" : undefined,
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
