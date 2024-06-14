@@ -25,14 +25,15 @@ export const getAllXmlData = async (req, res) => {
   const sortBy = req.query.sortBy || "updatedAt"
   const sort = +(req.query.sort ?? "-1")
   const page = +(req.query.page ?? "1");
+  const filter = (req.query.filter ?? "");
+  const filterBy = (req.query.filterBy ?? "name");
+  const filterValue = filterBy === "traductionPercent" && filter ? +filter : new RegExp(filter)
   const paginator = new Paginator({ page, perPage: 10 });
   const xmlData = await xmlDataCollection
-    .findAsync({}, { en: 0 })
+    .findAsync({ [filterBy]: filterValue }, { en: 0 })
     .sort({ [sortBy]: sort })
     .skip(paginator.skip)
     .limit(paginator.limit);
-
-  console.log(xmlData[0])
 
   const totalElement = await xmlDataCollection.countAsync({})
   const totalPage = paginator.getTotalPage(totalElement)

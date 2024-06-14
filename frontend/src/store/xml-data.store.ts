@@ -8,6 +8,8 @@ interface XmlDataStore {
   totalPage: number;
   sortBy: string;
   sort: 1 | -1;
+  filterBy: string;
+  filter: string;
   setXmlData: (xmlData: XmlData[]) => void;
   setPage: (page: number) => void;
   setTotalElement: (totalElement: number) => void;
@@ -15,6 +17,8 @@ interface XmlDataStore {
   setSortBy: (sortBy: string) => void;
   changeSort: () => void;
   setSort: (sort: 1 | -1) => void;
+  setFilterBy: (filterBy: string) => void;
+  setFilter: (filter: string) => void;
 }
 
 export const useXmlDataStore = create<XmlDataStore>((set) => ({
@@ -24,6 +28,8 @@ export const useXmlDataStore = create<XmlDataStore>((set) => ({
   totalPage: 0,
   sortBy: "updatedAt",
   sort: -1,
+  filterBy: "name",
+  filter: "",
   setPage: (page) => set({ page }),
   setXmlData: (xmlData) => set({ xmlData }),
   setTotalElement: (totalElement) => set({ totalElement }),
@@ -31,4 +37,6 @@ export const useXmlDataStore = create<XmlDataStore>((set) => ({
   setSortBy: (sortBy) => set({ sortBy }),
   changeSort: () => set(({ sort }) => ({ sort: sort === 1 ? -1 : 1 })),
   setSort: (sort) => set({ sort }),
+  setFilterBy: (filterBy) => set({ filterBy }),
+  setFilter: (filter) => set({ filter }),
 }));

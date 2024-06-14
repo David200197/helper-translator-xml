@@ -21,11 +21,20 @@ import {
 import ActionCell from "../layer/ActionCell";
 import { Button } from "../ui/button";
 import SortButton from "../layer/SortButton";
+import { Input } from "../ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const columns: ColumnDef<XmlData>[] = [
   {
     accessorKey: "name",
     header: () => <SortButton name="Nombre" field="name" />,
+    meta: { name: "Nombre", field: "name" },
   },
   {
     accessorKey: "traductionPercent",
@@ -33,16 +42,19 @@ const columns: ColumnDef<XmlData>[] = [
       <SortButton name="Porciento de traducción" field="traductionPercent" />
     ),
     cell: ({ row }) => row.getValue("traductionPercent") + "%",
+    meta: { name: "Porciento de traducción", field: "traductionPercent" },
   },
   {
     accessorKey: "createdAt",
     header: () => <SortButton name="Fecha de creación" field="createdAt" />,
+    meta: { name: "Fecha de creación", field: "createdAt" },
   },
   {
     accessorKey: "updatedAt",
     header: () => (
       <SortButton name="Fecha de actualización" field="updatedAt" />
     ),
+    meta: { name: "Fecha de actualización", field: "updatedAt" },
   },
   {
     id: "actions",
@@ -66,6 +78,13 @@ const MainPage = () => {
     isInitialPage,
     nextPage,
     prevPage,
+    setFilter,
+    filter,
+    setFilterBy,
+    getAllXmlData,
+    sort,
+    sortBy,
+    filterBy,
   } = useXmlData({
     autoLoad: true,
   });
@@ -82,6 +101,32 @@ const MainPage = () => {
 
   return (
     <div>
+      <div className="flex items-center py-4">
+        <Input
+          placeholder="Filtrar por..."
+          value={filter}
+          onChange={async (event) => {
+            const currentValue = event.target.value;
+            setFilter(currentValue);
+            await getAllXmlData(page, sortBy, sort, currentValue, filterBy);
+          }}
+          className="max-w-sm mr-2"
+        />
+        <Select
+          defaultValue={(columns[0].meta as Record<string, string>).field}
+          onValueChange={(value) => setFilterBy(value)}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Theme" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="name">Nombre</SelectItem>
+            <SelectItem value="traductionPercent">
+              Porciento de traducción
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>

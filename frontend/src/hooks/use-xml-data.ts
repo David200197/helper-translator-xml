@@ -23,15 +23,27 @@ export const useXmlData = ({ autoLoad = false }: Options = {}) => {
     sort,
     sortBy,
     setSort,
+    filter,
+    setFilterBy,
+    filterBy,
+    setFilter,
   } = useXmlDataStore();
 
   const isInitialPage = page <= 1;
   const isEndPage = page >= totalPage;
 
   const getAllXmlData = useCallback(
-    async (page: number, sortBy: string, sort: 1 | -1) => {
+    async (
+      page: number,
+      sortBy: string,
+      sort: 1 | -1,
+      filter: string,
+      filterBy: string
+    ) => {
       const { ok, data, totalElement, totalPage } = await fetch(
-        getXmlDataUrl(`?page=${page}&sort=${sort}&sortBy=${sortBy}`)
+        getXmlDataUrl(
+          `?page=${page}&sort=${sort}&sortBy=${sortBy}&filter=${filter}&filterBy=${filterBy}`
+        )
       ).then((res) => res.json());
       if (!ok) return toast.error("Los metadatos de xml no a sido cargados");
       setTotalElement(totalElement);
@@ -52,7 +64,7 @@ export const useXmlData = ({ autoLoad = false }: Options = {}) => {
       method: "POST",
       body,
     });
-    await getAllXmlData(page, sortBy, sort);
+    await getAllXmlData(page, sortBy, sort, filter, filterBy);
     toast.success("Xml agregado correctamente");
   };
 
@@ -76,7 +88,7 @@ export const useXmlData = ({ autoLoad = false }: Options = {}) => {
     }).then((res) => res.json());
     if (!ok) return toast.error("Los metadatos de xml no a sido borrados");
     toast.success("Los metadatos de xml a sido borrados");
-    getAllXmlData(page, sortBy, sort);
+    getAllXmlData(page, sortBy, sort, filter, filterBy);
   };
 
   const nextPage = () => {
@@ -92,10 +104,10 @@ export const useXmlData = ({ autoLoad = false }: Options = {}) => {
   useEffect(() => {
     const run = async () => {
       if (!autoLoad) return;
-      getAllXmlData(page, sortBy, sort);
+      getAllXmlData(page, sortBy, sort, filter, filterBy);
     };
     run();
-  }, [autoLoad, getAllXmlData, page, sort, sortBy]);
+  }, [autoLoad, getAllXmlData, page, sort, sortBy, filter, filterBy]);
 
   return {
     xmlData,
@@ -116,5 +128,9 @@ export const useXmlData = ({ autoLoad = false }: Options = {}) => {
     sort,
     sortBy,
     setSort,
+    filter,
+    setFilterBy,
+    filterBy,
+    setFilter,
   };
 };

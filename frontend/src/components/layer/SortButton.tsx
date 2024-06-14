@@ -4,14 +4,23 @@ import { useXmlData } from "@/hooks/use-xml-data";
 
 type Props = { name: string; field: string };
 const SortButton = ({ name, field }: Props) => {
-  const { sortBy, sort, setSortBy, changeSort, page, getAllXmlData, setSort } =
-    useXmlData();
+  const {
+    sortBy,
+    sort,
+    setSortBy,
+    changeSort,
+    page,
+    getAllXmlData,
+    setSort,
+    filter,
+    filterBy,
+  } = useXmlData();
 
   const Arrow = sort === 1 ? ArrowUp : ArrowDown;
   const isSelected = field === sortBy;
 
   const onClick = async () => {
-    await getAllXmlData(page, sortBy, sort);
+    await getAllXmlData(page, sortBy, sort, filter, filterBy);
     if (isSelected) {
       changeSort();
       return;
