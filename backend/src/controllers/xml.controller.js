@@ -4,6 +4,8 @@ import { Paginator } from "../utils/paginator.js";
 import { xmlDataCollection } from "../db.js";
 import { convertEnToEmptyEs } from "../utils/convert-en-to-empty-es.js";
 import { getTraductionPercent } from "../utils/get-traduction-percent.js";
+import { createTranslateFields } from "../utils/create-translate-fields.js";
+import { updateEs } from "../utils/update-es.js";
 
 export const setXmlData = async (req, res) => {
   const files = req.files;
@@ -49,6 +51,10 @@ export const getOneXmlData = async (req, res) => {
   const id = req.params.id;
   const data = await xmlDataCollection.findOneAsync({ id });
   if (!data) return res.status(400).json({ ok: false });
+  const translateFields = createTranslateFields(data.en, data.es)
+  data.translateFields = translateFields
+  delete data.en
+  delete data.es
   res.json({ ok: true, data });
 };
 
@@ -73,3 +79,14 @@ export const downloadXml = async (req, res) => {
   const buffer = Buffer.from(xml, "utf8");
   res.end(buffer)
 };
+
+export const updateOneFieldEsXml = async (req, res) => {
+  const id = req.params.id;
+  const field = req.body.field
+  const text = req.body.text
+  const data = await xmlDataCollection.findOneAsync({ id });
+  if (!data) return res.status(400).json({ ok: false });
+  const newEs = updateEs(data.es, field, text)
+  await xmlDataCollection.updateAsync({ id }, { es: newEs })
+  res.json({ ok: true });
+}
