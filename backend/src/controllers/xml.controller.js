@@ -88,3 +88,16 @@ export const updateOneFieldEsXml = async (req, res) => {
   await xmlDataCollection.updateAsync({ id }, data)
   res.json({ ok: true });
 }
+
+export const updateManyFieldEsXml = async (req, res) => {
+  const id = req.params.id;
+  const changes = req.body.changes
+  if (!Array.isArray(changes)) return res.json({ ok: false });
+  const data = await xmlDataCollection.findOneAsync({ id });
+  if (!data) return res.status(400).json({ ok: false });
+  data.traductionPercent = getTraductionPercent(data.es)
+  for (const { name, text } of changes)
+    updateEs(data.es, name, text)
+  await xmlDataCollection.updateAsync({ id }, data)
+  res.json({ ok: true });
+}
