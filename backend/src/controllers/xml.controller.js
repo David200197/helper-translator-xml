@@ -31,19 +31,14 @@ export const getAllXmlData = async (req, res) => {
   const filterBy = (req.query.filterBy ?? "name");
   const filterValue = filterBy === "traductionPercent" && filter ? +filter : new RegExp(filter)
   const paginator = new Paginator({ page, perPage: 6 });
-  const xmlData = await xmlDataCollection
-    .findAsync({ [filterBy]: filterValue }, { en: 0 })
+  const data = await xmlDataCollection
+    .findAsync({ [filterBy]: filterValue }, { en: 0, es: 0 })
     .sort({ [sortBy]: sort })
     .skip(paginator.skip)
     .limit(paginator.limit);
 
   const totalElement = await xmlDataCollection.countAsync({})
   const totalPage = paginator.getTotalPage(totalElement)
-
-  const data = xmlData.map(({ es, ...value }) => ({
-    ...value,
-    traductionPercent: getTraductionPercent(es),
-  }));
   res.json({ ok: true, data, totalElement, totalPage });
 };
 
@@ -82,11 +77,14 @@ export const downloadXml = async (req, res) => {
 
 export const updateOneFieldEsXml = async (req, res) => {
   const id = req.params.id;
-  const field = req.body.field
+  const name = req.body.name
   const text = req.body.text
   const data = await xmlDataCollection.findOneAsync({ id });
   if (!data) return res.status(400).json({ ok: false });
-  const newEs = updateEs(data.es, field, text)
-  await xmlDataCollection.updateAsync({ id }, { es: newEs })
+  data.traductionPercent = getTraductionPercent(data.es)
+  const updated = updateEs(data.es, name, text)
+  if (!updated)
+    return res.json({ ok: false });
+  await xmlDataCollection.updateAsync({ id }, data)
   res.json({ ok: true });
 }

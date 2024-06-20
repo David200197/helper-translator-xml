@@ -5,6 +5,7 @@ import {
   getOneXmlData,
   removeOneXmlData,
   setXmlData,
+  updateOneFieldEsXml,
 } from "../controllers/xml.controller.js";
 import multer from "multer";
 
@@ -15,6 +16,7 @@ xmlRouter.post("/", upload.array("files"), setXmlData);
 xmlRouter.get("/", getAllXmlData);
 xmlRouter.get("/:id", getOneXmlData);
 xmlRouter.get("/download/:id", downloadXml);
+xmlRouter.put("/:id", updateOneFieldEsXml);
 xmlRouter.delete("/:id", removeOneXmlData);
 
 export { xmlRouter };
