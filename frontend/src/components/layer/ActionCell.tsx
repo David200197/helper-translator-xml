@@ -22,10 +22,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
+import { useNavigate } from "react-router-dom";
 
 export const ActionCell = ({ row }: CellContext<XmlData, unknown>) => {
   const currentXmlData = row.original;
 
+  const navigate = useNavigate();
   const { deleteOneXmlData, downloadXml } = useXmlData();
 
   return (
@@ -38,7 +40,9 @@ export const ActionCell = ({ row }: CellContext<XmlData, unknown>) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuItem>Traducir</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate(currentXmlData.id)}>
+          Traducir
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => downloadXml(currentXmlData.id, "en")}>
           Descargar Xml en ingles
         </DropdownMenuItem>

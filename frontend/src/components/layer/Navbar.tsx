@@ -11,9 +11,13 @@ import {
 
 import { useHotkeys } from "@/hooks/use-hotkeys";
 import { useXmlData } from "@/hooks/use-xml-data";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const { addXML } = useXmlData();
+  const navigate = useNavigate();
+
+  const navigateToHome = () => navigate("/");
 
   const saveTranslate = () => {
     console.log("save XML");
@@ -28,10 +32,13 @@ const Navbar = () => {
       <MenubarMenu>
         <MenubarTrigger>Inicio</MenubarTrigger>
         <MenubarContent>
+          <MenubarItem onClick={navigateToHome}>
+            Ir a la página principal
+          </MenubarItem>
           <MenubarItem onClick={addXML}>
             Agregar XML <MenubarShortcut>Ctrl + O</MenubarShortcut>
           </MenubarItem>
-          <MenubarItem disabled onClick={addXML}>
+          <MenubarItem disabled onClick={() => {}}>
             Salvar Traducción <MenubarShortcut>Ctrl + S</MenubarShortcut>
           </MenubarItem>
           <MenubarSeparator />
